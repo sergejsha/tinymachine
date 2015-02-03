@@ -39,7 +39,7 @@ public class Example {
       
         @StateHandler(state=STATE_A)
         public void onEventStateA(String event, TinyMachine tm) {
-            // This method is called when an event of type String is fired while machine is in STATE_A
+            // It's called when an event of type String is fired while machine is in STATE_A
         
             // As an example, let's transition into STATE_B when event "DONE" is received
             if ("DONE".equals(event)) {
