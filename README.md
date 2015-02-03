@@ -2,16 +2,15 @@
 TinyMachine is fun to use and easy to read [FSM][1] tailored for Android. It helps you to write compact and easy to read code when used with event bus based application design.
 
 # TinyMachine is
-=======
  - extra small (~ 5K jar)
  - easy to use
  - well tested
  - annotation based (no requiremens on method names, no interfaces to implement)
  
 # TinyMachine API in a nutshell
- - `@StateHandler(state=STATE_A, type=Type.OnEntry)` annotates methods receiving `OnEntry` event in `STATE_A`.
- - `@StateHandler(state=STATE_A, type=Type.OnExit)` annotates methods receiving `OnExit` event in `STATE_A`.
- - `@StateHandler(state=STATE_A, type=Type.OnEvent)` annotates methods receiving custom events in `STATE_A`.
+ - `@StateHandler(state=STATE_A, type=Type.OnEntry)` annotates handler methods receiving `OnEntry` event in `STATE_A`.
+ - `@StateHandler(state=STATE_A, type=Type.OnExit)` annotates handler methods receiving `OnExit` event in `STATE_A`.
+ - `@StateHandler(state=STATE_A, type=Type.OnEvent)` annotates handler methods receiving custom events in `STATE_A`.
  - `TinyMachine.fireEvent(Object event)` forwards given event to the corresponding handler method.
  - `TinyMachine.transitionTo(int state)` transtions the state machine into a new state.
 
