@@ -25,26 +25,25 @@ import de.halfbit.tinymachine.StateHandler.Type;
 
 /**
  * Finite-state machine implementation class.
- * <p/>
- * <p/>
- * Once created <code>TinyMachine</code> is capable to accept events
- * and deliver them to a handler instance given in constructor. Handler
- * instance defines public methods with {@link de.halfbit.tinymachine.StateHandler}
- * annotation. Every method is intended to handler certain events in certain
- * state. You can have as many handler methods as you need.
- * <p/>
- * <p/>
- * When you receive an event, you just need to forward it to a <code>TinyMachine</code>
- * instance and it will deliver it to the right handler method. Simply call
- * {@link #fireEvent(Object)} for this. If there is no handler method for given event
- * in given state, <code>TinyMachine</code> will silently ignore it.
- * <p/>
- * <p/>
- * There is no static configuration for transitions between states. You need to program
- * is inside your handler methods. Call {@link #transitionTo(int)} methods to move your
- * state machine into a new state. <code>TinyMachine</code> will automatically fire
- * <code>Type.OnExit</code> event for the current state and <code>Type.OnEntry</code> event
- * for the new state. If there are handlers for this events, then they will be called.
+ * <p>
+ *     Once created <code>TinyMachine</code> is capable to accept events
+ *     and deliver them to a handler instance given in constructor. Handler
+ *     instance defines public methods with {@link de.halfbit.tinymachine.StateHandler}
+ *     annotation. Every method is intended to handler certain events in certain
+ *     state. You can have as many handler methods as you need.
+ *
+ * <p>
+ *     When you receive an event, you just need to forward it to a <code>TinyMachine</code>
+ *     instance and it will deliver it to the right handler method. Simply call
+ *     {@link #fireEvent(Object)} for this. If there is no handler method for given event
+ *     in given state, <code>TinyMachine</code> will silently ignore it.
+ *
+ * <p>
+ *     There is no static configuration for transitions between states. You need to program
+ *     is inside your handler methods. Call {@link #transitionTo(int)} methods to move your
+ *     state machine into a new state. <code>TinyMachine</code> will automatically fire
+ *     <code>Type.OnExit</code> event for the current state and <code>Type.OnEntry</code> event
+ *     for the new state. If there are handlers for this events, then they will be called.
  *
  * @author Sergej Shafarenka
  */
@@ -164,8 +163,8 @@ public class TinyMachine {
      * <code>TinyMachine</code> will trace all processed events and state transitions including
      * events for which handlers in current state are missed.
      *
-     * @param tag
-     * @return
+     * @param tag   the name of tag to be used in <code>Log.d()</code>
+     * @return      this instance
      */
     public TinyMachine setTraceTag(String tag) {
         mTraceTag = tag;

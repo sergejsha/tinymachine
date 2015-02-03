@@ -23,13 +23,12 @@ import java.lang.annotation.Target;
 /**
  * Apply this annotation to public methods responsible for handling
  * certain events in certain states.
- * <p/>
- * <p/>
- * There is three types of events:
- * <li><code>OnEntry</code> gets called when machine enters given state
- * <li><code>OnExit</code> gets called when machine leaves given state
- * <li><code>OnEvent (default)</code> gets called when machine receives
- * given event in given state
+ * <p>
+ *     There is three types of events:
+ *     <li><code>OnEntry</code> gets called when machine enters given state</li>
+ *     <li><code>OnExit</code> gets called when machine leaves given state</li>
+ *     <li><code>OnEvent (default)</code> gets called when machine receives
+ *          given event in given state</li>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -43,15 +42,13 @@ public @interface StateHandler {
 
     /**
      * Defines in which state this handler must be active
-     *
-     * @return a state constant
+     * @return  a state constant
      */
     int state();
 
     /**
      * Defines type of event this handler processes
-     *
-     * @return
+     * @return  the type of event
      */
     int type() default Type.OnEvent;
 
