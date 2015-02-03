@@ -192,4 +192,12 @@ public class TinyMachineTest extends TestCase {
         }
     }
 
+    public void testNullEvent() {
+        try {
+            mTinyMachine.fireEvent(null);
+            fail("IllegalArgumentException is expected");
+        } catch (IllegalArgumentException e) {
+            // OK
+        }
+    }
 }
