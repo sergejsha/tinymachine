@@ -1,5 +1,5 @@
 
-TinyMachine is fun to use [FSM][1] tailored for Android. It helps you to write compact and easy to read code when used with event bus based application design.
+TinyMachine is fun to use [finit-state machine][1]. It helps you to write compact and easy to read code when used with event bus based application design. No deep if-else or switch-case statements, no static state transition tables, no complex models. Just clearly structured state handling and transition logic.
 
 # TinyMachine is
  - extra small (~ 5K jar)
