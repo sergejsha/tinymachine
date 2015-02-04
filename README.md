@@ -46,6 +46,7 @@ public class Example {
             // As an example, let's transition into STATE_B when event "DONE" is received
             if ("DONE".equals(event)) {
               tm.transitionTo(STATE_B);
+              // Since now all further events will be received by STATE_B handlers
             }
         }
       
@@ -56,7 +57,7 @@ public class Example {
             // This method is called when machine enters STATE_B
         }
 
-        // etc ...
+        // and so on
     }
     
     private TinyMachine mTinyMachine;
@@ -65,14 +66,18 @@ public class Example {
         // Create state machine with TinyHandler and put it into initial STATE_A state
         mTinyMachine = new TinyMachine(new TinyHandler(), STATE_A);
     }
+
+    // Now, when we receive events we just need to forward them to TinyMachine instance.
+    // The machine is responsible to deliver them to the right handler depending on event
+    // type and the current state.
     
-    // Now, when we receive events we just need to forward them to TinyMachine. TinyMachine 
-    // is responsible to deliver them to the right handler depending on the current state.
+    @Subscribe
     public void onEvent(String event) {
+        // E.g. forward this event coming from TinyBus to the state machine for processing.
         mTinyMachine.fireEvent(event);
     }
     
-    // Here we can forward more events in the same manner.
+    // etc ... We can forward more events in the same way.
 }
 ```
 
