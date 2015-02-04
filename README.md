@@ -13,6 +13,8 @@ TinyMachine is fun to use [finit-state machine][1]. It helps you to write compac
  - `@StateHandler(state=STATE_A, type=Type.OnEvent)` annotates handler methods receiving custom events in `STATE_A`.
  - `TinyMachine.fireEvent(Object event)` forwards given event to the corresponding handler method.
  - `TinyMachine.transitionTo(int state)` transtions the state machine into a new state.
+ - `TinyMachine.getCurrentState()` returns current machine's state 
+ - `TinyMachine.setTraceTag(String tag)` enables or disables state change and event handling traces in LogCat using given tag.
 
 # Usage example
 ```java
