@@ -34,6 +34,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface StateHandler {
 
+    public static final int STATE_ANY = Integer.MIN_VALUE;
+
     public static class Type {
         public static final int OnEntry = 0;
         public static final int OnEvent = 1;

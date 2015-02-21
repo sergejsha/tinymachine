@@ -15,11 +15,11 @@
  */
 package de.halfbit.tinymachine;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-
 import android.util.Log;
 import android.util.SparseArray;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
 
 import de.halfbit.tinymachine.StateHandler.Type;
 
@@ -49,17 +49,13 @@ import de.halfbit.tinymachine.StateHandler.Type;
  */
 public class TinyMachine {
 
-    private static class OnEntry {
-    }
-
-    private static class OnExit {
-    }
-
     private final Object mHandler;
     private final SparseArray<HashMap<Class<?>, Method>> mCallbacks;
+    private final TaskQueue mTaskQueue;
 
     private String mTraceTag;
     private int mCurrentState;
+    private boolean mQueueProcessed;
 
     /**
      * Creates new instance of FSM machine and assigns handler class
@@ -76,6 +72,7 @@ public class TinyMachine {
         mHandler = handler;
         mCurrentState = initialState;
         mCallbacks = new SparseArray<>();
+        mTaskQueue = new TaskQueue();
 
         final Method[] methods = handler.getClass().getMethods();
         Class<?>[] params;
@@ -110,10 +107,12 @@ public class TinyMachine {
                         throw new IllegalArgumentException(
                                 "Unsupported event type: " + ann.type());
                 }
-                HashMap<Class<?>, Method> callbacks = mCallbacks.get(ann.state());
+
+                final int state = ann.state();
+                HashMap<Class<?>, Method> callbacks = mCallbacks.get(state);
                 if (callbacks == null) {
                     callbacks = new HashMap<>();
-                    mCallbacks.put(ann.state(), callbacks);
+                    mCallbacks.put(state, callbacks);
                 }
                 if (callbacks.put(eventType, method) != null) {
                     throw new IllegalArgumentException("Duplicate handler methods not allowed" +
@@ -136,7 +135,8 @@ public class TinyMachine {
         if (event == null) {
             throw new IllegalArgumentException("Event must not be null.");
         }
-        fire(event.getClass(), event);
+        mTaskQueue.offer(Task.obtainTask(Task.CODE_FIRE_EVENT, event, -1));
+        if (!mQueueProcessed) processTaskQueue();
     }
 
     /**
@@ -148,14 +148,8 @@ public class TinyMachine {
      * @param state new state to put state machine into
      */
     public void transitionTo(int state) {
-        if (mCurrentState != state) {
-            fire(OnExit.class, null);
-            mCurrentState = state;
-            if (mTraceTag != null) {
-                log("new state", null);
-            }
-            fire(OnEntry.class, null);
-        }
+        mTaskQueue.offer(Task.obtainTask(Task.CODE_TRANSITION, null, state));
+        if (!mQueueProcessed) processTaskQueue();
     }
 
     /**
@@ -185,15 +179,54 @@ public class TinyMachine {
 
     //-- implementation
 
-    private void fire(Class<?> handlerType, Object event) {
+    private void processTaskQueue() {
+        mQueueProcessed = true;
+        try {
+            Task task;
+            while((task = mTaskQueue.poll()) != null) {
+                switch (task.code) {
+
+                    case Task.CODE_FIRE_EVENT: {
+                        Object event = task.event;
+                        final Class<? extends Object> clazz = event.getClass();
+                        fire(clazz, event, StateHandler.STATE_ANY);
+                        fire(clazz, event, mCurrentState);
+                        break;
+                    }
+
+                    case Task.CODE_TRANSITION: {
+                        int state = task.state;
+                        if (mCurrentState != state) {
+                            fire(OnExit.class, null, StateHandler.STATE_ANY);
+                            fire(OnExit.class, null, mCurrentState);
+                            mCurrentState = state;
+                            if (mTraceTag != null) {
+                                log("new state", null);
+                            }
+                            fire(OnEntry.class, null, StateHandler.STATE_ANY);
+                            fire(OnEntry.class, null, mCurrentState);
+                        }
+                        break;
+                    }
+
+                    default: throw new IllegalStateException("wrong code: " + task.code);
+                }
+                task.recycle();
+            }
+        } finally {
+            mQueueProcessed = false;
+        }
+    }
+
+    private void fire(Class<?> handlerType, Object event, int state) {
         Method method = null;
-        HashMap<Class<?>, Method> callbacks = mCallbacks.get(mCurrentState);
+        HashMap<Class<?>, Method> callbacks = mCallbacks.get(state);
         if (callbacks != null) {
             method = callbacks.get(handlerType);
         }
 
         if (method == null) {
-            if (mTraceTag != null) {
+            if (mTraceTag != null && state != StateHandler.STATE_ANY) {
                 // log missing handler method
                 if (handlerType == OnEntry.class) {
                     log("OnEntry", "no handler method");
@@ -257,4 +290,109 @@ public class TinyMachine {
         Log.d(mTraceTag, "  [" + mCurrentState + "] "
                 + eventType + (message == null ? "" : ", " + message));
     }
+
+    //region Inner classes (same as in tinybus)
+
+    private static class OnEntry {}
+    private static class OnExit {}
+
+    private static class Task {
+
+        private static final TaskPool POOL = new TaskPool(6);
+
+        public static final int CODE_FIRE_EVENT = 0;
+        public static final int CODE_TRANSITION = 1;
+
+        // task as linked list item
+        public Task prev;
+
+        // general purpose
+        public int code;
+        public Object event;
+        public int state;
+
+        private Task() { }
+
+        public static Task obtainTask(int code, Object event, int state) {
+            Task task;
+            synchronized (POOL) {
+                task = POOL.acquire();
+            }
+            task.code = code;
+            task.event = event;
+            task.state = state;
+            task.prev = null;
+            return task;
+        }
+
+        public void recycle() {
+            event = null;
+            synchronized (POOL) {
+                POOL.release(this);
+            }
+        }
+
+    }
+
+    /** Task pool for better reuse of task instances */
+    private static class TaskPool {
+
+        private final int mMaxSize;
+        private int mSize;
+        private Task tail;
+
+        public TaskPool(int maxSize) {
+            mMaxSize = maxSize;
+        }
+
+        Task acquire() {
+            Task acquired = tail;
+            if (acquired == null) {
+                acquired = new Task();
+            } else {
+                tail = acquired.prev;
+                mSize--;
+            }
+            return acquired;
+        }
+
+        void release(Task task) {
+            if (mSize < mMaxSize) {
+                task.prev = tail;
+                tail = task;
+                mSize++;
+            }
+        }
+    }
+
+    private static class TaskQueue {
+
+        protected Task head;
+        protected Task tail;
+
+        public void offer(Task task) {
+            if (tail == null) {
+                tail = head = task;
+            } else {
+                tail.prev = task;
+                tail = task;
+            }
+        }
+
+        public Task poll() {
+            if (head == null) {
+                return null;
+            } else {
+                Task task = head;
+                head = head.prev;
+                if (head == null) {
+                    tail = null;
+                }
+                return task;
+            }
+        }
+    }
+
+    //endregion
+
 }

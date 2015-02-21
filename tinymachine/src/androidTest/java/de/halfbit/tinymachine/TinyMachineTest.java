@@ -25,38 +25,6 @@ public class TinyMachineTest extends TestCase {
     private static final int STATE_INTERMEDIATE = 1;
     private static final int STATE_FINAL = 2;
 
-    private static class OnEntry {
-        public int state;
-        public OnEntry(int state) {
-            this.state = state;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) return true;
-            if (o instanceof OnEntry) {
-                return ((OnEntry)o).state == state;
-            }
-            return false;
-        }
-    }
-
-    private static class OnExit {
-        public int state;
-        public OnExit(int state) {
-            this.state = state;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) return true;
-            if (o instanceof  OnExit) {
-                return ((OnExit)o).state == state;
-            }
-            return false;
-        }
-    }
-
     private class TinyHandler extends Callbacks {
 
         //-- STATE_INITIAL
@@ -98,6 +66,23 @@ public class TinyMachineTest extends TestCase {
             onCallback(new OnExit(tm.getCurrentState()));
         }
 
+        //-- STATE_ANY
+
+        @StateHandler(state = StateHandler.STATE_ANY, type = Type.OnEntry)
+        public void onEntryAny(TinyMachine tm) {
+            onCallback(new OnEntry(StateHandler.STATE_ANY));
+        }
+
+        @StateHandler(state = StateHandler.STATE_ANY)
+        public void onEventAny(Integer event) {
+            onCallback(event);
+        }
+
+        @StateHandler(state = StateHandler.STATE_ANY, type = Type.OnExit)
+        public void onExitAny(TinyMachine tm) {
+            onCallback(new OnExit(StateHandler.STATE_ANY));
+        }
+
     }
 
     private TinyMachine mTinyMachine;
@@ -117,7 +102,24 @@ public class TinyMachineTest extends TestCase {
         mTinyHandler = null;
 		super.tearDown();
 	}
-	
+
+    public void testAnyStateHandler() {
+        mTinyMachine.fireEvent("event1");
+        mTinyMachine.fireEvent(new Integer(20));
+        mTinyMachine.transitionTo(STATE_FINAL);
+        mTinyMachine.fireEvent(new Integer(25));
+
+        mTinyHandler.assertEqualEvents(
+                "event1",
+                new Integer(20),
+                new OnExit(StateHandler.STATE_ANY),
+                new OnExit(STATE_INITIAL),
+                new OnEntry(StateHandler.STATE_ANY),
+                new OnEntry(STATE_FINAL),
+                new Integer(25)
+        );
+    }
+
 	public void testAllHandlersPresent() {
         mTinyMachine.fireEvent("event1");
         mTinyMachine.fireEvent("event2");
@@ -128,10 +130,14 @@ public class TinyMachineTest extends TestCase {
         mTinyHandler.assertEqualEvents(
                 "event1",
                 "event2",
+                new OnExit(StateHandler.STATE_ANY),
                 new OnExit(STATE_INITIAL),
+                new OnEntry(StateHandler.STATE_ANY),
                 new OnEntry(STATE_FINAL),
                 "event3",
+                new OnExit(StateHandler.STATE_ANY),
                 new OnExit(STATE_FINAL),
+                new OnEntry(StateHandler.STATE_ANY),
                 new OnEntry(STATE_INITIAL)
         );
 	}
@@ -146,8 +152,12 @@ public class TinyMachineTest extends TestCase {
 
         mTinyHandler.assertEqualEvents(
                 "event1",
+                new OnExit(StateHandler.STATE_ANY),
                 new OnExit(STATE_INITIAL),
+                new OnEntry(StateHandler.STATE_ANY),
+                new OnExit(StateHandler.STATE_ANY),
                 new OnExit(STATE_INTERMEDIATE),
+                new OnEntry(StateHandler.STATE_ANY),
                 new OnEntry(STATE_FINAL),
                 "event4"
         );
