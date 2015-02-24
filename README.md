@@ -27,6 +27,12 @@ public class Example {
 
     // Define state handler class with handler methods
     public static class TinyHandler {
+    
+        // Handlers for ANY_STATE
+        @StateHandler(state=STATE_A, type=Type.OnEntry)
+        public void onEntryStateA() {
+            // This method is called when machine enters any new state
+        }
 
         // Handlers for STATE_A
 
@@ -86,7 +92,7 @@ Gradle dependencies
 =======
 ```
 dependencies {
-    compile 'de.halfbit:tinymachine:1.0.+'
+    compile 'de.halfbit:tinymachine:1.1.+'
 }
 ```
 
