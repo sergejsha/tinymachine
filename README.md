@@ -29,24 +29,24 @@ public class Example {
     public static class TinyHandler {
     
         // Handlers for ANY_STATE
-        @StateHandler(state=STATE_A, type=Type.OnEntry)
+        @StateHandler(state = StateHandler.STATE_ANY, type = Type.OnEntry)
         public void onEntryStateA() {
             // This method is called when machine enters any new state
         }
 
         // Handlers for STATE_A
 
-        @StateHandler(state=STATE_A, type=Type.OnEntry)
+        @StateHandler(state = STATE_A, type = Type.OnEntry)
         public void onEntryStateA() {
             // This method is called when machine enters STATE_A
         }
 
-        @StateHandler(state=STATE_A, type=Type.OnExit)
+        @StateHandler(state = STATE_A, type = Type.OnExit)
         public void onExitStateA() {
             // This method is called when machine exits STATE_A
         }
       
-        @StateHandler(state=STATE_A)
+        @StateHandler(state = STATE_A)
         public void onEventStateA(String event, TinyMachine tm) {
             // It's called when an event of type String is fired while machine is in STATE_A
         
@@ -59,7 +59,7 @@ public class Example {
       
         // Handlers for STATE_B
       
-        @StateHandler(state=STATE_B, type=Type.OnEntry)
+        @StateHandler(state = STATE_B, type = Type.OnEntry)
         public void onEntryStateB() {
             // This method is called when machine enters STATE_B
         }
