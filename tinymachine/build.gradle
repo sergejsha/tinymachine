@@ -9,9 +9,9 @@ android {
 		minSdkVersion 9
 		targetSdkVersion 21
 
-		//testInstrumentationRunner "android.test.InstrumentationTestRunner"
-        //testHandleProfiling false
-	    //testFunctionalTest true
+		testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        testHandleProfiling false
+	    testFunctionalTest true
 
         consumerProguardFiles 'proguard-rules.pro'
 	}

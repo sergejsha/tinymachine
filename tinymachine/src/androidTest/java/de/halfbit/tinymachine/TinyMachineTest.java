@@ -15,11 +15,11 @@
  */
 package de.halfbit.tinymachine;
 
-import junit.framework.TestCase;
+import android.test.AndroidTestCase;
 
 import de.halfbit.tinymachine.StateHandler.Type;
 
-public class TinyMachineTest extends TestCase {
+public class TinyMachineTest extends AndroidTestCase {
 
     private static final int STATE_INITIAL = 0;
     private static final int STATE_INTERMEDIATE = 1;

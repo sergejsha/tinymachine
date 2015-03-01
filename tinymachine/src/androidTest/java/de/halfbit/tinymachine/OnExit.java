@@ -1,6 +1,6 @@
 package de.halfbit.tinymachine;
 
-class OnExit {
+public class OnExit {
     public int state;
     public OnExit(int state) {
         this.state = state;

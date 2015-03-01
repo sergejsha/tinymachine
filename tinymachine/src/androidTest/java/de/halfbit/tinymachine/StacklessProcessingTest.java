@@ -15,11 +15,11 @@
  */
 package de.halfbit.tinymachine;
 
-import junit.framework.TestCase;
+import android.test.AndroidTestCase;
 
 import de.halfbit.tinymachine.StateHandler.Type;
 
-public class StacklessProcessingTest extends TestCase {
+public class StacklessProcessingTest extends AndroidTestCase {
 
     private static final int STATE_UNDEFINED = -1;
     private static final int STATE_INITIAL = 0;

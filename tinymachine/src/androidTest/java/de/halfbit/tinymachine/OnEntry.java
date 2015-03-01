@@ -1,6 +1,6 @@
 package de.halfbit.tinymachine;
 
-class OnEntry {
+public class OnEntry {
     public int state;
     public OnEntry(int state) {
         this.state = state;
