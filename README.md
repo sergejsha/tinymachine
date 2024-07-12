@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/beworker/tinymachine.svg)](https://travis-ci.org/beworker/tinymachine)
+![maintenance-status](https://img.shields.io/badge/maintenance-as--is-yellow.svg)
 
 TinyMachine is fun to use [finite-state machine][1]. It helps you to write compact and clearly structured code when used in [event-driver programming][3]. No deep if-else or switch-case statements, no static state transition tables, no complex, hard to understand models. Just clearly structured state handling and transition logic. This is what TinyMachine is.
 
